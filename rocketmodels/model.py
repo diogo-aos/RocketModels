@@ -1,7 +1,8 @@
 import tensorflow as tf
+import numpy as np
 import os
 
-models_dir = '/rocketmodels/models'
+model_dir = '/rocketmodels/models'
 num_top_predictions = 5
 
 
@@ -33,7 +34,7 @@ def run_inference_on_image(image, model):
         image_ary = sess.run([image_process])
 
     # Creates graph from saved GraphDef.
-    create_graph()
+    create_graph(model)
 
     with tf.Session() as sess:
         # Some useful tensors:
@@ -63,6 +64,6 @@ def run_all_models(image):
     results = {}
     for m in models:
         predictions = run_inference_on_image(image, m)
-        results[m] = predictions
+        results[m] = list(predictions)
 
     return results
