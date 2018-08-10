@@ -1,6 +1,9 @@
 import os
 from flask import Flask, request, redirect, url_for
+from flask import jsonify
 from werkzeug.utils import secure_filename
+
+from .models import run_all_models
 
 UPLOAD_FOLDER = '/home/diogoaos/workspace/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -18,11 +21,6 @@ def upload_file():
     if request.method == 'GET':
         return 'working...'
     if request.method == 'POST':
-        print(request.files)
-        print(dir(request.files))
-        print('hello0')
-        print(request.files.get('file'))
-        print('hello')
         # check if the post request has the file part
         if 'file' not in request.files:
             return 'file type not supported, allowed extensions:{}'.format(ALLOWED_EXTENSIONS)
@@ -37,8 +35,11 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             fn = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            print(dir(file))
-            print(fn)
             file.save(fn)
+
+            results = run_all_models(fn)
+
+            return jsonify(results)
+            
             return 'file saved in {}'.format(fn), 200
     return 'ok',200
