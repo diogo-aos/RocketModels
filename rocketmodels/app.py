@@ -1,10 +1,17 @@
 import os
+import tempfile
+
 from flask import Flask, request, redirect, url_for
 from flask import jsonify
 from werkzeug.utils import secure_filename
 
+
+
 from .models import run_all_models
 
+
+
+UPLOAD_IMAGE_FN = tempfile.mkstemp()
 UPLOAD_FOLDER = '/home/diogoaos/workspace/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -19,7 +26,8 @@ def allowed_file(filename):
 @app.route('/api', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'GET':
-        return 'working...'
+        return 'working...', 200
+    
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -35,11 +43,10 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             fn = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(fn)
+            file.save(UPLOAD_IMAGE_FN)
 
-            results = run_all_models(fn)
+            results = run_all_models(UPLOAD_IMAGE_FN)
 
             return jsonify(results)
             
-            return 'file saved in {}'.format(fn), 200
-    return 'ok',200
+    return 'not ok',200
