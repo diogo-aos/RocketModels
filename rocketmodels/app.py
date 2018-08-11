@@ -1,5 +1,6 @@
 import os
 import tempfile
+import argparse
 
 from flask import Flask, request, redirect, url_for
 from flask import jsonify
@@ -7,11 +8,29 @@ from werkzeug.utils import secure_filename
 
 from model import run_all_models
 
+input_height = 299
+input_width = 299
+input_mean = 0
+input_std = 255
+input_layer = "input"
+output_layer = "InceptionV3/Predictions/Reshape_1"
+PORT = 5000
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--input_height", type=int, help="input height", default=input_height)
+parser.add_argument("--input_width", type=int, help="input width", default=input_width)
+parser.add_argument("--input_mean", type=int, help="input mean", default=input_mean)
+parser.add_argument("--input_std", type=int, help="input std", default=input_std)
+parser.add_argument("--input_layer", help="name of input layer", default=input_layer)
+parser.add_argument("--output_layer", help="name of output layer", default=output_layer)
+parser.add_argument("--port", help="port to use", default=PORT)
+args = parser.parse_args()
 
 
 UPLOAD_IMAGE_FN = tempfile.mkstemp()
-UPLOAD_FOLDER = '/rocketmodels/'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+UPLOAD_FOLDER = '/tmp/'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'bmp'])
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -43,7 +62,7 @@ def upload_file():
             fn = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(fn)
 
-            results = run_all_models(fn)
+            results = run_all_models(fn, args)
 
             return jsonify(results)
             
@@ -51,4 +70,4 @@ def upload_file():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8888, debug=True)
+    app.run(host='0.0.0.0', port=args.port, debug=True)
