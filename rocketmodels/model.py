@@ -52,11 +52,17 @@ def run_inference_on_image(image_data, model, input_layer, output_layer):
     create_graph(model)
 
     with tf.Session() as sess:
-        softmax_tensor = sess.graph.get_tensor_by_name(output_layer) # 'final_result:0'
+        # softmax_tensor = sess.graph.get_tensor_by_name(output_layer) # 'final_result:0'
+        # predictions = sess.run(softmax_tensor, {input_layer: image_data})  # 'Placeholder:0'
 
-        predictions = sess.run(softmax_tensor, {input_layer: image_data})  # 'Placeholder:0'
+        input_name = input_layer
+        output_name = output_layer
+        input_operation = sess.graph.get_operation_by_name(input_name)
+        output_operation = sess.graph.get_operation_by_name(output_name)
+        
+        results = sess.run(output_operation.outputs[0], {input_operation.outputs[0]: image_data})
 
-        predictions = np.squeeze(predictions)
+        predictions = np.squeeze(results)
 
         top_k = predictions.argsort()[-num_top_predictions:][::-1]
     return top_k
@@ -69,15 +75,20 @@ def load_labels(label_file):
     return label
 
 def run_all_models(image, args):
-    model_files = ['/rocketmodels/models/output_graphfirstmodel.pb',
+    model_files = ['/rocketmodels/models/output_graphAlertAnxiousFright.pb',
+                   '/rocketmodels/models/output_graphfirstmodel.pb',
                    '/rocketmodels/models/output_graphsecondmodel.pb',
                    '/rocketmodels/models/output_graphthirdmodel.pb',
-                   '/rocketmodels/models/output_graphfourthmodel.pb']
-    label_files = ['/rocketmodels/models/output_labelsfirstmodel.txt',
+                   '/rocketmodels/models/output_graphfourthmodel.pb'
+                  ]
+    label_files = ['/rocketmodels/models/output_labelsAlertAnxiousFright.txt',
+                   '/rocketmodels/models/output_labelsfirstmodel.txt',
                    '/rocketmodels/models/output_labelssecondmodel.txt',
                    '/rocketmodels/models/output_labelsthirdmodel.txt',
-                   '/rocketmodels/models/output_labelsfourthmodel.txt']
+                   '/rocketmodels/models/output_labelsfourthmodel.txt'
+                  ]
 
+                
     results = {}
 
     # load image once for all models

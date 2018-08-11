@@ -13,8 +13,8 @@ input_height = 299
 input_width = 299
 input_mean = 0
 input_std = 255
-input_layer = "input"
-output_layer = "InceptionV3/Predictions/Reshape_1"
+input_layer = "Placeholder"
+output_layer = "final_result"
 PORT = 5000
 
 parser = argparse.ArgumentParser()
@@ -65,14 +65,13 @@ def upload_file():
             fn = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(fn)
             print('received file saved in {}'.format(fn))
-            print('running all models on image')
+            print('running all models...')
             results = run_all_models(fn, args)
 
-            
             return jsonify(results)
             
     return 'not ok',200
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=args.port, debug=True)
+    app.run(host='0.0.0.0', port=args.port)
