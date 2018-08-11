@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import os
 
-model_dir = '/rocketmodels/models'
+
 num_top_predictions = 5
 
 def preprocess(file_name,
@@ -31,8 +31,7 @@ def preprocess(file_name,
 def create_graph(model_fn):
     """Creates a graph from saved GraphDef file and returns a saver."""
     # Creates graph from saved graph_def.pb.
-    with tf.gfile.FastGFile(os.path.join(
-            model_dir, model_fn), 'rb') as f:
+    with tf.gfile.FastGFile(model_fn, 'rb') as f:
         graph_def = tf.GraphDef()
         graph_def.ParseFromString(f.read())
         _ = tf.import_graph_def(graph_def, name='')
@@ -75,6 +74,11 @@ def run_all_models(image, args):
               'output_labelssecondmodel.txt',
               'output_labelsthirdmodel.txt',
               'output_labelsfourthmodel.txt']
+
+    model_dir = '/rocketmodels/models'
+    model_files = [os.path.join(model_dir, m_fn) for m_fn in model_files]
+    label_files = [os.path.join(model_dir, l_fn) for l_fn in label_files]
+
     # model_files = ["output_graphSubRelaxPlay.pb", "output_graphAlertAnxiousFright.pb", "output_graphCalmDomAggres.pb"]
     # label_files = ["output_labelsSubRelaxPlay.txt","output_labelsAlertAnxiousFright.txt","output_labelsCalmDomAggres.txt"]
                  
@@ -88,7 +92,7 @@ def run_all_models(image, args):
                             args.input_std)
     
     for m_fn, l_fn in zip(model_files, label_files):
-        labels = load_labels(os.path.join(model_dir, l_fn))
+        labels = load_labels(l_fn)
         predictions = run_inference_on_image(image_data, m_fn, args.input_layer, args.output_layer)
         results[m_fn] = [labels[l] for l in list(predictions)]
 

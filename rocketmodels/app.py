@@ -27,7 +27,7 @@ parser.add_argument("--port", help="port to use", default=PORT)
 args = parser.parse_args()
 
 
-UPLOAD_IMAGE_FN = tempfile.mkstemp()
+#UPLOAD_IMAGE_FN = tempfile.mkstemp()
 
 UPLOAD_FOLDER = '/tmp/'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'bmp'])
