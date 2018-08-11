@@ -1,2 +1,0 @@
-from rocketmodels import app
-
