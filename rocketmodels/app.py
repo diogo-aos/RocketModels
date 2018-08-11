@@ -30,7 +30,7 @@ args = parser.parse_args()
 
 #UPLOAD_IMAGE_FN = tempfile.mkstemp()
 
-UPLOAD_FOLDER = '/tmp/'
+UPLOAD_FOLDER = tempfile.mkdtemp()
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'bmp'])
 
 app = Flask(__name__)
@@ -54,14 +54,23 @@ def upload_file():
 
         file = request.files['file']
 
-        # if user does not select file, browser also
-        # submit a empty part without filename
+        # empty filename error
         if file.filename == '':
             print('empty filename')
-            return 'empty filename', 200
+            return 'empty filename', 400
 
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+        # file without extension error
+        if '.' not in file.filename:
+            return 'file without extension', 400
+
+        file_extension = file.filename.rsplit('.', 1)[1].lower()
+
+        # bad extension error
+        if file_extension not in ALLOWED_EXTENSIONS:
+            return 'extension {} not allowed; allowed extensions are {}'.format(file_extension, ALLOWED_EXTENSIONS), 400
+
+        if file:
+            filename = 'image.{}'.format(file_extension)
             fn = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(fn)
             print('received file saved in {}'.format(fn))

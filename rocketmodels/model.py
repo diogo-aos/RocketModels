@@ -61,11 +61,9 @@ def run_inference_on_image(image_data, model, input_layer, output_layer):
         output_operation = sess.graph.get_operation_by_name(output_name)
         
         results = sess.run(output_operation.outputs[0], {input_operation.outputs[0]: image_data})
-
         predictions = np.squeeze(results)
-
-        top_k = predictions.argsort()[-num_top_predictions:][::-1]
-    return top_k
+        
+    return predictions
 
 def load_labels(label_file):
     label = []
@@ -102,6 +100,9 @@ def run_all_models(image, args):
         print('running model {}'.format(m_fn))
         labels = load_labels(l_fn)
         predictions = run_inference_on_image(image_data, m_fn, args.input_layer, args.output_layer)
-        results[m_fn] = [labels[l] for l in list(predictions)]
+        top_k = predictions.argsort()[-num_top_predictions:][::-1]
+        top_k_pred = [float(predictions[i]) for i in top_k]
+        top_k_labels = [labels[i] for i in list(top_k)]
+        results[m_fn] = {'labels': top_k_labels, 'probability': top_k_pred}
 
     return results
