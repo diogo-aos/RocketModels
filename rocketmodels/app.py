@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import tempfile
 import argparse
@@ -48,26 +49,30 @@ def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
-            return 'file type not supported, allowed extensions:{}'.format(ALLOWED_EXTENSIONS)
+            print('no file in request')
+            return 'no file in request'
 
         file = request.files['file']
 
         # if user does not select file, browser also
         # submit a empty part without filename
         if file.filename == '':
-            return 'empty filename'
+            print('empty filename')
+            return 'empty filename', 200
 
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             fn = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(fn)
-
+            print('received file saved in {}'.format(fn))
+            print('running all models on image')
             results = run_all_models(fn, args)
 
+            
             return jsonify(results)
             
     return 'not ok',200
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=args.port)
+    app.run(host='0.0.0.0', port=args.port, debug=True)

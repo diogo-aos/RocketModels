@@ -1,6 +1,9 @@
+from __future__ import print_function
+import os
+
 import tensorflow as tf
 import numpy as np
-import os
+
 
 
 num_top_predictions = 5
@@ -92,6 +95,7 @@ def run_all_models(image, args):
                             args.input_std)
     
     for m_fn, l_fn in zip(model_files, label_files):
+        print('running model {}'.format(m_fn))
         labels = load_labels(l_fn)
         predictions = run_inference_on_image(image_data, m_fn, args.input_layer, args.output_layer)
         results[m_fn] = [labels[l] for l in list(predictions)]
