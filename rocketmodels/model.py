@@ -69,22 +69,15 @@ def load_labels(label_file):
     return label
 
 def run_all_models(image, args):
-    model_files = ['output_graphfirstmodel.pb',
-              'output_graphsecondmodel.pb',
-              'output_graphthirdmodel.pb',
-              'output_graphfourthmodel.pb']
-    label_files = ['output_labelsfirstmodel.txt',
-              'output_labelssecondmodel.txt',
-              'output_labelsthirdmodel.txt',
-              'output_labelsfourthmodel.txt']
+    model_files = ['/rocketmodels/models/output_graphfirstmodel.pb',
+                   '/rocketmodels/models/output_graphsecondmodel.pb',
+                   '/rocketmodels/models/output_graphthirdmodel.pb',
+                   '/rocketmodels/models/output_graphfourthmodel.pb']
+    label_files = ['/rocketmodels/models/output_labelsfirstmodel.txt',
+                   '/rocketmodels/models/output_labelssecondmodel.txt',
+                   '/rocketmodels/models/output_labelsthirdmodel.txt',
+                   '/rocketmodels/models/output_labelsfourthmodel.txt']
 
-    model_dir = '/rocketmodels/models'
-    model_files = [os.path.join(model_dir, m_fn) for m_fn in model_files]
-    label_files = [os.path.join(model_dir, l_fn) for l_fn in label_files]
-
-    # model_files = ["output_graphSubRelaxPlay.pb", "output_graphAlertAnxiousFright.pb", "output_graphCalmDomAggres.pb"]
-    # label_files = ["output_labelsSubRelaxPlay.txt","output_labelsAlertAnxiousFright.txt","output_labelsCalmDomAggres.txt"]
-                 
     results = {}
 
     # load image once for all models
